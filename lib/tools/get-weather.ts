@@ -1,3 +1,5 @@
+import { tool } from "ai";
+import { z } from "zod";
 import type { GetWeatherArgs, GetWeatherResult } from "@/lib/chat/types";
 
 const SUMMARIES = ["Sunny", "Cloudy", "Rainy", "Windy", "Partly cloudy"] as const;
@@ -13,7 +15,7 @@ function hashLocation(location: string): number {
 export async function getWeather(args: GetWeatherArgs): Promise<GetWeatherResult> {
   const location = args.location.trim();
   if (!location) {
-    throw new Error("Location is required.");
+    throw new Error("Location must be a non-empty string");
   }
 
   const hash = hashLocation(location);
@@ -26,3 +28,11 @@ export async function getWeather(args: GetWeatherArgs): Promise<GetWeatherResult
     summary,
   };
 }
+
+export const getWeatherTool = tool({
+  description: "Get the current weather for a location in Celsius",
+  inputSchema: z.object({
+    location: z.string().min(1).describe("City or place name"),
+  }),
+  execute: getWeather,
+});
