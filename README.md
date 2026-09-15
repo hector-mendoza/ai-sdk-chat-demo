@@ -76,7 +76,7 @@ This repo is linked to Vercel. Pushing to `main` deploys automatically. Set `ANT
 
 `POST /api/chat`
 
-- **Request body:** `{ messages: UIMessage[] }` (sent by `useChat` / `DefaultChatTransport`)
-- **Response:** AI SDK UI message stream (`createUIMessageStreamResponse`)
+- **Request body:** `{ messages: Omit<ChatMessage, "id" | "createdAt">[] }` — each message has `role` and `content`. The client strips ids via `prepareSendMessagesRequest` before sending.
+- **Response:** AI SDK UI message stream (consumed by `useChat`)
 
-The app maps stream parts to `ChatMessage` and `ToolCall` view models in `lib/chat/types.ts` for rendering.
+The app maps AI SDK stream parts to `ChatMessage` and `ToolCall` view models in `lib/chat/types.ts` at the component boundary.

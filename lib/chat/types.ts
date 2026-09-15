@@ -39,7 +39,7 @@ export type ToolCall =
       error: string;
     };
 
-export type ChatRequestMessage = Omit<ChatMessage, "id" | "createdAt">;
+export type ChatMessageInput = Omit<ChatMessage, "id" | "createdAt">;
 
 export type ChatViewItem =
   | { kind: "message"; message: ChatMessage }
@@ -52,22 +52,37 @@ function textFromParts(message: UIMessage): string {
     .join("");
 }
 
-function mapToolPart(part: {
+type GetWeatherToolPart = {
+  type: "tool-getWeather";
   toolCallId: string;
-  state: string;
-  input?: unknown;
-  output?: unknown;
+  input?: GetWeatherArgs;
+  output?: GetWeatherResult;
   errorText?: string;
-}): ToolCall {
-  const args = (part.input ?? { location: "" }) as GetWeatherArgs;
+  state:
+    | "input-streaming"
+    | "input-available"
+    | "output-available"
+    | "output-error";
+};
 
-  if (part.state === "output-available") {
+function getWeatherArgs(input: GetWeatherArgs | undefined): GetWeatherArgs {
+  if (input?.location) {
+    return { location: input.location };
+  }
+
+  return { location: "Unknown" };
+}
+
+function mapToolPart(part: GetWeatherToolPart): ToolCall {
+  const args = getWeatherArgs(part.input);
+
+  if (part.state === "output-available" && part.output) {
     return {
       id: part.toolCallId,
       name: "getWeather",
       args,
       state: "done",
-      result: part.output as GetWeatherResult,
+      result: part.output,
     };
   }
 
@@ -126,11 +141,18 @@ export function mapUIMessagesToViewItems(messages: UIMessage[]): ChatViewItem[] 
         items.push({
           kind: "tool",
           messageId: message.id,
-          toolCall: mapToolPart(part),
+          toolCall: mapToolPart(part as GetWeatherToolPart),
         });
       }
     }
   }
 
   return items;
+}
+
+export function toApiMessages(messages: UIMessage[]): ChatMessageInput[] {
+  return messages.map((message) => ({
+    role: message.role === "user" ? "user" : "assistant",
+    content: textFromParts(message),
+  }));
 }
