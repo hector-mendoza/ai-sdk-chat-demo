@@ -1,6 +1,6 @@
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 
 export function getModel() {
-  const modelId = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
-  return openai(modelId);
+  const modelId = process.env.ANTHROPIC_MODEL ?? "claude-haiku-4-5";
+  return anthropic(modelId);
 }
