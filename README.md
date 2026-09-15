@@ -17,7 +17,7 @@ app/
   page.tsx                 # Chat shell (composer + message list + tool card)
   api/chat/route.ts        # POST → streamText with getWeather tool
 lib/
-  ai/model.ts              # Model wiring (OpenAI via env)
+  ai/model.ts              # Model wiring (Anthropic via env)
   tools/get-weather.ts     # Deterministic fake weather tool
   chat/types.ts            # ChatMessage, ToolCall, and UI mapping helpers
 components/chat/
@@ -45,13 +45,13 @@ components/chat/
 
    | Variable | Description |
    | --- | --- |
-   | `OPENAI_API_KEY` | OpenAI API key for `@ai-sdk/openai` |
+   | `ANTHROPIC_API_KEY` | Anthropic API key for `@ai-sdk/anthropic` |
 
    Optional:
 
    | Variable | Description |
    | --- | --- |
-   | `OPENAI_MODEL` | Model id (default: `gpt-4o-mini`) |
+   | `ANTHROPIC_MODEL` | Model id (default: `claude-haiku-4-5`) |
 
 3. Start the dev server:
 
@@ -70,7 +70,7 @@ npm start
 
 ## Deploy
 
-This repo is linked to Vercel. Pushing to `main` deploys automatically. Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`) in the Vercel project environment variables.
+This repo is linked to Vercel. Pushing to `main` deploys automatically. Set `ANTHROPIC_API_KEY` (and optionally `ANTHROPIC_MODEL`) in the Vercel project environment variables.
 
 ## API
 
